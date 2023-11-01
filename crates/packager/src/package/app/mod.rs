@@ -315,6 +315,21 @@ fn copy_frameworks_to_bundle(
                 let dest_path = dest_dir.join(src_name);
                 copy_dir(&src_path, &dest_path)?;
                 paths.push(dest_path);
+
+                // find dylib in framework
+                for entry in walkdir::WalkDir::new(&src_path)
+                    .min_depth(1)
+                    .into_iter()
+                    .filter_map(|e| e.ok())
+                {
+                    if let Ok(relative_path) = entry.path().strip_prefix(&src_path) {
+                        if Some("dylib") == relative_path.extension().and_then(OsStr::to_str) {
+                            let sign_path = dest_dir.join(src_name).join(relative_path);
+                            paths.push(sign_path);
+                        }
+                    }
+                }
+
                 continue;
             } else if framework.ends_with(".dylib") {
                 let src_path = PathBuf::from(&framework);
