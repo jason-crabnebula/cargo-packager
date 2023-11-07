@@ -307,7 +307,7 @@ fn copy_frameworks_to_bundle(
         std::fs::create_dir_all(contents_directory)?;
 
         for framework in frameworks {
-            if framework.ends_with(".framework") {
+            if framework.ends_with(".framework") || framework.ends_with(".app") {
                 let src_path = PathBuf::from(framework);
                 let src_name = src_path
                     .file_name()
